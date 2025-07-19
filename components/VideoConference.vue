@@ -21,6 +21,11 @@
           :waitingList="waitingList"
           :runAction="commands.run"
         />
+
+        <RecordScreenModule
+            :ref="(obj) => modules['record'] = obj"
+            :webrtc="webrtc"
+        />
       </template>
       <template v-slot:screenShare>
         <ShareScreenModule
@@ -58,7 +63,8 @@ import VideoConferenceActions from './VideoConferenceActions.vue'
 import ChatModule from './modules/ChatModule.vue'
 import PeopleModule from './modules/PeopleModule.vue'
 import ShareScreenModule from './modules/ShareScreenModule.vue'
-import CommandsDeckModule from "./modules/CommandsDeckModule.vue";
+import RecordScreenModule from './modules/RecordScreenModule.vue'
+import CommandsDeckModule from './modules/CommandsDeckModule.vue'
 
 const webrtc = inject('webrtc')
 
@@ -101,6 +107,7 @@ const modules = ref({
   chat: null,
   people: null,
   screen: null,
+  record: null,
 })
 const room = ref(null)
 const token = ref(null)

@@ -149,11 +149,33 @@
           <path d="M12,1L8,5H11V14H13V5H16M18,23H6C4.89,23 4,22.1 4,21V9A2,2 0 0,1 6,7H9V9H6V21H18V9H15V7H18A2,2 0 0,1 20,9V21A2,2 0 0,1 18,23Z" />
         </svg>
       </a>
+
+      <a
+          v-if="props.userSettings.isCreator && !webrtc.isFirefox()"
+          class="btn btn-small btn-danger btn-action"
+          @click.prevent="props.commands.open('record')"
+      >
+        <span class="tooltip top">
+          {{ (!props.userSettings.record) ? 'Start record' : 'Stop record' }}
+        </span>
+        <svg
+            v-if="!props.userSettings.record"
+            xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-record-circle-fill" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+        </svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-stop-fill" viewBox="0 0 16 16">
+          <path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5"/>
+        </svg>
+      </a>
     </div>
   </div>
 </template>
 
 <script setup>
+import { inject } from 'vue'
+
+const webrtc = inject('webrtc');
+
 const props = defineProps({
   userSettings: {
     type: Object,
