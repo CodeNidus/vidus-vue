@@ -1,14 +1,14 @@
 {
   "name": "vidus-vue",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "dependencies": {
-    "vue": "^3.2.37",
-    "vue-router": "^4.1.3",
-    "vue-loader": "^17.0.0",
-    "sass": "^1.54.4",
-    "sass-loader": "^13.0.2",
-	"vue3-emoji-picker": "^1.1.8",
-    "vidus-core": "^1.0.0"
+	"sass": "^1.89.2",
+    "sass-loader": "^16.0.5",
+    "vue": "^3.5.17",
+    "vue-loader": "^17.4.2",
+    "vue-router": "^4.5.1",
+    "vue3-emoji-picker": "^1.1.8",
+    "vidus-core": "^1.0.3"
   },
   "description": "Vidus video conference vue package",
   "main": "index.js",
