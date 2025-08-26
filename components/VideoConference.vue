@@ -204,7 +204,7 @@ const initialize = async (roomItem = null, tokenItem = null) => {
     });
 
     try {
-      webrtc.initialPeerJs().then(async (peerJsId) => {
+      webrtc.initialPeerJs(token.value).then(async (peerJsId) => {
         startEstablishingConnection()
       }).catch((error) => {
         emit('onPeerJsConnectionFailed')
@@ -223,7 +223,7 @@ const startEstablishingConnection = () => {
 }
 
 const establishingConnection = () => {
-  if(isReady.value || props.waiting) {
+  if(isReady.value || props.waiting || connectionFailed.value) {
     return
   }
 
@@ -334,6 +334,12 @@ const eventHandlerWaitUntilHostAdmit = () => {
   emit('onSetWaitingStatus', true)
 }
 
+const eventHandlerPeerJsConnectionFailed = (detail) => {
+  isReady.value = false
+  connectionFailed.value = true
+  emit('onPeerJsConnectionFailed')
+}
+
 /**
  * Fix mobile device browser minimize stream bug
  */
@@ -352,6 +358,7 @@ onBeforeUnmount(() => {
   leftTheRoom()
   window.removeEventListener('onWaitUntilAdmit', eventHandlerWaitUntilHostAdmit)
   window.removeEventListener('onConnectToRoomSuccess', eventHandlerConnectToRoomSuccess)
+  window.removeEventListener('onPeerJsConnectionFailed', eventHandlerPeerJsConnectionFailed)
 
   if (webrtc.isMobileDevice()) {
     window.removeEventListener('visibilitychange', checkBrowserWindowVisibility)
@@ -361,6 +368,7 @@ onBeforeUnmount(() => {
 setThemeLayout()
 window.addEventListener('onWaitUntilAdmit', eventHandlerWaitUntilHostAdmit)
 window.addEventListener('onConnectToRoomSuccess', eventHandlerConnectToRoomSuccess)
+window.addEventListener('onPeerJsConnectionFailed', eventHandlerPeerJsConnectionFailed)
 
 if (webrtc.isMobileDevice()) {
   window.addEventListener('visibilitychange', checkBrowserWindowVisibility)
