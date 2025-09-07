@@ -1,5 +1,5 @@
 <template>
-  <div id="screen-sharing">
+  <div id="screen-sharing" ref="shareScreen">
     <div id="screen-sharing-area">
       <div
         class="screen-share-full-screen"
@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   webrtc: {
@@ -27,6 +27,7 @@ const props = defineProps({
 })
 
 const video = ref()
+const shareScreen = ref()
 
 const open = async (room) => {
   if (!props.webrtc.userSettings.share) {
@@ -50,6 +51,30 @@ const fullscreen  = () => {
   video.value.requestFullscreen()
 }
 
+const setActionEventListener = () => {
+  window.addEventListener('onScreenShareModule', shareScreenModuleAction);
+}
+
+const clearListener = () => {
+  window.removeEventListener('onScreenShareModule', shareScreenModuleAction);
+}
+
+const shareScreenModuleAction = (event) => {
+  if (shareScreen) {
+    shareScreen.value.style.display = event.detail?.status? 'block' : 'none';
+  }
+}
+
+
+onMounted(() => {
+  setActionEventListener()
+  shareScreenModuleAction({detail: { status: false }})
+})
+
+onUnmounted(() => {
+  clearListener()
+})
+
 defineExpose({
   open,
   fullscreen,
@@ -58,7 +83,6 @@ defineExpose({
 
 <style lang="scss">
 #screen-sharing {
-  display: none;
   position: relative!important;
 
   #screen-sharing-area {

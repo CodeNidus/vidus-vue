@@ -188,7 +188,6 @@ const initialize = async (roomItem = null, tokenItem = null) => {
         localVideoRef: 'video-item',
         remoteVideoRef: 'remote-video',
         remoteAudioRef: 'remote-audio',
-        screenShareRef: 'screen-sharing',
         resolution: props.devices.resolution
       },
       callback: {
