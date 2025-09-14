@@ -114,7 +114,7 @@
       </a>
 
       <a
-        v-if="props.userSettings.isCreator"
+        v-if="props.userSettings.isCreator && 1 == 2"
         class="btn btn-default btn-action"
         @click.prevent="props.commands.run('faceApi')"
       >
