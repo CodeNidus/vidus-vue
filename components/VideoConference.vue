@@ -137,21 +137,6 @@ const commands = ref({
   isMobile: () => { return webrtc.isMobileDevice() }
 })
 
-const connect = () => {
-  return new Promise((resolve, reject) => {
-    if (!webrtc.socket.connected) {
-      webrtc.connection({
-        token: token.value
-      });
-
-      webrtc.socket.once("connect", () => {
-        console.log('socket connected!');
-        resolve(true);
-      });
-    }
-  });
-}
-
 const initialize = async (roomItem = null, tokenItem = null) => {
   room.value = roomItem
   token.value = tokenItem
@@ -180,39 +165,40 @@ const initialize = async (roomItem = null, tokenItem = null) => {
     micDisable: props.micDisable,
   }, userSettings.value)
 
-  connect().then(async () => {
-    webrtc.setup({
-      options: {
-        name: props.name,
-        roomId: room.value.id,
-        localVideoRef: 'video-item',
-        remoteVideoRef: 'remote-video',
-        remoteAudioRef: 'remote-audio',
-        resolution: props.devices.resolution
-      },
-      callback: {
-        joinRoom: userJoinRoom,
-        leftRoom: userLeftRoom,
-        invalidRoom: invalidRoom,
-        exitConference: exitConference,
-        banInRoom: banInRoom,
-      },
-      connections: connections.value,
-      waitingList: waitingList.value,
-      userSettings: userSettings.value,
-    });
+  webrtc.setup({
+    options: {
+      name: props.name,
+      roomId: room.value.id,
+      localVideoRef: 'video-item',
+      remoteVideoRef: 'remote-video',
+      remoteAudioRef: 'remote-audio',
+      resolution: props.devices.resolution
+    },
+    callback: {
+      joinRoom: userJoinRoom,
+      leftRoom: userLeftRoom,
+      invalidRoom: invalidRoom,
+      exitConference: exitConference,
+      banInRoom: banInRoom,
+    },
+    connections: connections.value,
+    waitingList: waitingList.value,
+    userSettings: userSettings.value,
+  });
 
-    try {
-      webrtc.initialPeerJs(token.value).then(async (peerJsId) => {
-        startEstablishingConnection()
-      }).catch((error) => {
-        emit('onPeerJsConnectionFailed')
-      })
-    } catch (error) {
-      console.log('webrtc initialize error:')
-      console.log(error)
-    }
-  })
+  try {
+    await webrtc.openConnection(token.value);
+
+    webrtc.initialPeerJs(token.value).then(async (peerJsId) => {
+      startEstablishingConnection()
+    }).catch((error) => {
+      emit('onPeerJsConnectionFailed')
+    })
+  } catch (error) {
+    console.log('webrtc initialize error:')
+    console.log(error)
+  }
+
 }
 
 const startEstablishingConnection = () => {
@@ -308,7 +294,6 @@ const openModule = (name) =>  {
 }
 
 const banInRoom = (data) =>  {
-  alert('you are ban!')
   exitConference()
 }
 
