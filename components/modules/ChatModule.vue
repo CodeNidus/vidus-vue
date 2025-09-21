@@ -160,7 +160,7 @@ const receivedMessageAction = (e) => {
   }
 
   insertMessage(user.name, e.detail.message, e.detail.private)
-  audio.play()
+  audio.value.play()
 
   if(!dialog.value) {
     props.webrtc.userSettings.newMessage = true
