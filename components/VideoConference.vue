@@ -163,7 +163,7 @@ const initialize = async (roomItem = null, tokenItem = null) => {
   userSettings.value = Object.assign({
     camDisable: props.camDisable,
     micDisable: props.micDisable,
-  }, userSettings.value)
+  }, userSettings.value);
 
   webrtc.setup({
     options: {
@@ -236,10 +236,8 @@ const leftTheRoom = async () =>  {
 
 const deviceMuteControl = (device) =>  {
   if(device === 'camera') {
-    userSettings.value.camDisable = !userSettings.value.camDisable
     webrtc.Media.muteCamera()
   } else {
-    userSettings.value.micDisable = !userSettings.value.micDisable
     webrtc.Media.muteMicrophone()
   }
 }
