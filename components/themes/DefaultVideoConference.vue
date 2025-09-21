@@ -267,7 +267,7 @@ const resizer = (_width) => {
 
 const reGenerateCanvasActionCanvas = () => {
   const canvasItem = document.getElementById('canvas-text-action-card')
-  const canvas = document.getElementById('canvas-text-scroll-section')
+  const canvas = document.getElementById('canvas-text-action-scroll-section')
   modulesArea.value.prepend(canvasItem)
   canvas.setAttribute('height', window.innerHeight / 4)
 }

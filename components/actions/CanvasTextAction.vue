@@ -1,5 +1,5 @@
 <template>
-  <div id="canvas-text" class="action" v-show="dialog || isPlay">
+  <div ref="canvasText" id="canvas-text" class="action" v-show="dialog || isPlay">
     <div id="canvas-text-action" class="action-setting" :style="{ 'display': ((dialog)? 'block' : 'none')}">
       <div class="action-setting-box" v-if="props.userSettings.isCreator">
         <h3>Canvas Text</h3>
@@ -45,8 +45,13 @@
       <div class="action-setting-back" @click="show(false)"></div>
     </div>
 
-    <div id="canvas-text-action-card">
+    <div ref="canvasTextActionCard" id="canvas-text-action-card">
       <div id="canvas-text-action-counter" v-if="props.userSettings.isCreator">
+        <div
+          v-if="props.webrtc.configs.debug"
+          ref="debugBar"
+          id="canvas-text-action-debug-bar"
+        ></div>
         <span
           v-if="isPlay"
           @click.prevent="pauseMessage"
@@ -56,13 +61,13 @@
           </span>
         <span class="mx-2 c-pointer" @click.prevent="marqueeMessage">{{ (!isPlay) ? 'Play' : 'Stop' }}</span>
       </div>
-      <canvas id="canvas-text-scroll-section"  height="250"/>
+      <canvas ref="canvasTextActionScrollSection" id="canvas-text-action-scroll-section"  height="250"/>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, inject } from 'vue'
+import { ref, computed, onMounted, inject, onUnmounted } from 'vue'
 
 const webrtc = inject('webrtc')
 const apiClient = webrtc.axios.getInstance()
@@ -92,6 +97,11 @@ const text = ref(null)
 const isPlay = ref(false)
 const isPause = ref(false)
 const files = ref([])
+
+const debugBar = ref()
+const canvasText = ref()
+const canvasTextActionCard = ref()
+const canvasTextActionScrollSection = ref()
 
 const action = ref({
   name: 'canvas-text',
@@ -125,7 +135,7 @@ const getTextFromBucket = () => {
   try {
     webrtc.helpers.canvasTextAction.getTextFromBucket(props.room?.id || 0).then(response => {
       loading.value = false
-   //   files.value = response
+      files.value = response
     })
   } catch {
     loading.value = false
@@ -172,8 +182,31 @@ const marqueeMessage = () => {
   show(false)
 }
 
+const setActionEventListener = () => {
+  window.addEventListener('onCanvasTextActionStatus', setCanvasElementsVisibility);
+}
+
+const clearListener = () => {
+  window.removeEventListener('onCanvasTextActionStatus', setCanvasElementsVisibility);
+}
+
+const setCanvasElementsVisibility = (event) => {
+  const state = (event.detail?.status)? 'block' : 'none';
+
+  //debugBar.value.style.display = state;
+  canvasText.value.style.display = state;
+  canvasTextActionCard.value.style.display = state;
+  canvasTextActionScrollSection.value.style.display = state;
+}
+
 onMounted(() => {
+  setCanvasElementsVisibility(false)
+  setActionEventListener()
   getTextFromBucket()
+})
+
+onUnmounted(() => {
+  clearListener()
 })
 
 
@@ -240,10 +273,14 @@ defineExpose({
       background: #ffdd00;
       padding: 5px;
       color: #333;
+
+      .canvas-text-action-debug-bar {
+
+      }
     }
 
     canvas {
-      display: none;
+
     }
   }
 }
