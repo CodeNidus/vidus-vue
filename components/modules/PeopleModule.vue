@@ -138,8 +138,8 @@ const show = (status = true) => {
   props.webrtc.userSettings.newAdmitRequest = false
 }
 
-const open = (room) => {
-  room.value = room
+const open = (roomItem) => {
+  room.value = roomItem
   show()
 }
 
