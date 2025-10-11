@@ -99,12 +99,12 @@
       </a>
 
       <a
-        v-if="props.userSettings.isCreator"
+        v-if="props.userSettings.isCreator && webrtc.configs.development.canvas.enable"
         class="btn btn-default btn-action"
-        @click.prevent="props.commands.run('canvasText')"
+        @click.prevent="props.commands.open('canvas')"
       >
         <span class="tooltip top">
-          Canvas Text
+          Canvas
         </span>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-text-fill"
              viewBox="0 0 16 16">

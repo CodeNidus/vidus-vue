@@ -108,7 +108,7 @@
 </template>
 
 <script setup>
-import {ref, inject, onUnmounted, onMounted, watch, computed } from 'vue'
+import {ref, inject, onMounted, watch, computed } from 'vue'
 
 const webrtc = inject('webrtc')
 
@@ -142,11 +142,6 @@ const isPortrait = computed(() => {
 const blurUserMediaBackground = (status) => {
   blur.value = status
   webrtc.Media.blurBackground(status)
-}
-
-const clearAllIntervals = () => {
-  for (let i = 1; i < 99999; i++)
-    window.clearInterval(i)
 }
 
 const toggleArea = () => {
@@ -265,22 +260,22 @@ const resizer = (_width) => {
   }
 }
 
-const reGenerateCanvasActionCanvas = () => {
-  const canvasItem = document.getElementById('canvas-text-action-card')
-  const canvas = document.getElementById('canvas-text-action-scroll-section')
-  modulesArea.value.prepend(canvasItem)
-  canvas.setAttribute('height', window.innerHeight / 4)
+const reSetCanvasAttributes = () => {
+  if (!webrtc.configs.development.canvas.enable) return;
+
+  const canvas = document.getElementById('canvas-module-canvas');
+  canvas.setAttribute('height', window.innerHeight / 4);
 }
 
 const setCanvasActionEventListener = () => {
-  window.addEventListener('onCanvasTextAction', receivedCanvasTextAction)
+  window.addEventListener('onCanvasModuleDisplay', receivedCanvasAction)
 }
 const setScreenShareEventListener = () => {
   window.addEventListener('onScreenShareModule', receivedScreenShareModuleEvent)
 }
 
-const receivedCanvasTextAction = (e) => {
-  canvasEnabled.value = (e.detail.play)
+const receivedCanvasAction = (e) => {
+  canvasEnabled.value = (e.detail.show)
 }
 
 const receivedScreenShareModuleEvent = (e) => {
@@ -292,17 +287,11 @@ onMounted(() => {
   resize()
   setCanvasActionEventListener()
   setScreenShareEventListener()
-  reGenerateCanvasActionCanvas()
+  reSetCanvasAttributes()
 
   window.addEventListener("resize", function () {
     resize()
   })
-})
-
-
-onUnmounted(() => {
-  // clear canvas text render interval
-  clearAllIntervals()
 })
 
 </script>
@@ -407,12 +396,10 @@ onUnmounted(() => {
         }
       }
 
-      #canvas-text-action-card {
+      #canvas-module {
         display: none;
-      //  flex: 1;
         width: 60vw;
         background: #E2E8F0;
-        opacity: 0.8;
         border-radius: 10px;
         margin-bottom: 10px;
         padding: 10px;

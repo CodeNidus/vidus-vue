@@ -4,6 +4,7 @@ import vidus from 'vidus-core'
 
 import Rooms from './components/Rooms.vue'
 import RoomJoin from './components/RoomJoin.vue'
+import Dialog from "./components/helpers/Dialog.vue";
 
 
 
@@ -19,6 +20,7 @@ const vidusVue = {
         app.provide('webrtc', vidus)
             .component('VCRooms', Rooms)
             .component('VCRoomJoin', RoomJoin)
+            .component('VCDialog', Dialog)
     }
 }
 

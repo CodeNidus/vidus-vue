@@ -24,14 +24,6 @@
     :userSettings="userSettings"
   />
 
-  <CanvasTextAction
-    :ref="(obj) => { setAction('canvas-text', obj) }"
-    class="action"
-    :room="room"
-    :webrtc="webrtc"
-    :userSettings="userSettings"
-  />
-
   <FaceApiAction
     :ref="(obj) => { setAction('face-api', obj) }"
     class="action"
@@ -57,7 +49,7 @@
   />
 
   <component
-    v-for="(action, index) in webrtc.actions"
+    v-for="(action, index) in filteredActions"
     :key="index"
     :is="action.view"
     :ref="(obj) => { setAction(index, obj) }"
@@ -76,7 +68,6 @@ import { ref } from 'vue'
 import BanAction from './actions/BanAction.vue'
 import TerminateAction from './actions/TerminateAction.vue'
 import MultiAction from './actions/MultiAction.vue'
-import CanvasTextAction from './actions/CanvasTextAction.vue'
 import FaceApiAction from './actions/FaceApiAction.vue'
 import MuteUserMicAction from './actions/MuteUserMicAction.vue'
 import AdmitAction from './actions/AdmitAction.vue'
@@ -101,6 +92,13 @@ const props = defineProps({
 })
 
 const actions = ref({})
+const filteredActions = ref({})
+
+for (const [key, value] of Object.entries(props.webrtc.actions)) {
+  if (!value?.category?.includes(['canvas'])) {
+    filteredActions.value[key] = value;
+  }
+}
 
 const setAction = (name, object) => {
   actions.value[name] = object
@@ -122,7 +120,7 @@ defineExpose({
 
   .action {
     position: absolute;
-    z-index: 999998;
+    z-index: 999;
   }
 }
 </style>

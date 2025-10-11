@@ -27,6 +27,14 @@
             :webrtc="webrtc"
         />
       </template>
+      <template v-slot:canvas>
+        <CanvasModule
+          v-if="webrtc.configs.development.canvas.enable"
+          :ref="(obj) => modules['canvas'] = obj"
+          :room="room"
+          :webrtc="webrtc"
+        />
+      </template>
       <template v-slot:screenShare>
         <ShareScreenModule
             :ref="(obj) => modules['screen'] = obj"
@@ -62,6 +70,7 @@ import '@tensorflow/tfjs-converter'
 import VideoConferenceActions from './VideoConferenceActions.vue'
 import ChatModule from './modules/ChatModule.vue'
 import PeopleModule from './modules/PeopleModule.vue'
+import CanvasModule from './modules/CanvasModule.vue'
 import ShareScreenModule from './modules/ShareScreenModule.vue'
 import RecordScreenModule from './modules/RecordScreenModule.vue'
 import CommandsDeckModule from './modules/CommandsDeckModule.vue'
@@ -106,6 +115,7 @@ const actions = ref()
 const modules = ref({
   chat: null,
   people: null,
+  canvas: null,
   screen: null,
   record: null,
 })
@@ -174,13 +184,6 @@ const initialize = async (roomItem = null, tokenItem = null) => {
       remoteAudioRef: 'remote-audio',
       resolution: props.devices.resolution
     },
-    callback: {
-      joinRoom: userJoinRoom,
-      leftRoom: userLeftRoom,
-      invalidRoom: invalidRoom,
-      exitConference: exitConference,
-      banInRoom: banInRoom,
-    },
     connections: connections.value,
     waitingList: waitingList.value,
     userSettings: userSettings.value,
@@ -230,7 +233,7 @@ const leftTheRoom = async () =>  {
     username: props.name,
   }
 
-  webrtc.Room.left(room.value?.id, data)
+  webrtc.Room.left(data)
   exitConference()
 }
 
@@ -244,14 +247,6 @@ const deviceMuteControl = (device) =>  {
 
 const exitConference = () => {
   emit('onCloseConference')
-}
-
-const userLeftRoom = (data) =>  {
-  console.log(data?.username + ' left room!')
-}
-
-const userJoinRoom = (data) =>  {
-  console.log('user join to room: ' + data.peerJsId)
 }
 
 const invalidRoom = (error) => {
@@ -341,6 +336,8 @@ onBeforeUnmount(() => {
   window.removeEventListener('onWaitUntilAdmit', eventHandlerWaitUntilHostAdmit)
   window.removeEventListener('onConnectToRoomSuccess', eventHandlerConnectToRoomSuccess)
   window.removeEventListener('onPeerJsConnectionFailed', eventHandlerPeerJsConnectionFailed)
+  window.removeEventListener('onInvalidRoom', invalidRoom)
+  window.removeEventListener('onExitConference', exitConference)
 
   if (webrtc.isMobileDevice()) {
     window.removeEventListener('visibilitychange', checkBrowserWindowVisibility)
@@ -351,6 +348,8 @@ setThemeLayout()
 window.addEventListener('onWaitUntilAdmit', eventHandlerWaitUntilHostAdmit)
 window.addEventListener('onConnectToRoomSuccess', eventHandlerConnectToRoomSuccess)
 window.addEventListener('onPeerJsConnectionFailed', eventHandlerPeerJsConnectionFailed)
+window.addEventListener('onInvalidRoom', invalidRoom)
+window.addEventListener('onExitConference', exitConference)
 
 if (webrtc.isMobileDevice()) {
   window.addEventListener('visibilitychange', checkBrowserWindowVisibility)
